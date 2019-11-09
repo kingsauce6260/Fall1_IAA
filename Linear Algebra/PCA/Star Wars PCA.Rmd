@@ -1,0 +1,97 @@
+---
+title: "Star Wars PCA"
+author: "Thomas Gow"
+date: "11/8/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Staw Wars PCA Example
+## Dr. Race's Class
+
+```{r cars}
+load('/Users/thomasgow/Documents/IAA/Fall1_IAA/Linear Algebra/PCA/StarWarsSurvey.RData')
+```
+
+
+Make model matrix with one hot encoded factors:
+```{r}
+starwars.x <- model.matrix(RespondentID~. ,contrasts.arg = lapply(starwars[,sapply(starwars, is.factor) ], contrasts, contrasts=FALSE),data = starwars)
+```
+
+Print the dimensions of the final matrix (with dummy variables enumerated):
+
+```{r}
+dim(starwars.x)
+```
+
+Side note: this is the true dimensionality of your data!
+
+```{r}
+pca <- prcomp(starwars.x, scale =T)
+```
+
+An error message! Cannot rescale a constant/zero column to unit variance. Solution: check for columns with zero variance and remove them. Recheck dimensions of the matrix to see how many columns we lost.
+
+```{r}
+starwars.x <- starwars.x[,apply(starwars.x, 2, sd)>0 ]
+dim(starwars.x)
+```
+
+We can now compute the principal components of the matrix:
+
+```{r}
+pca <- prcomp(starwars.x, scale =T)
+```
+
+To get the screeplot:
+```{r}
+plot(pca$sdev^2, type='b', ylab = 'Eigenvalue (Variance of Each Component)', main = 'Starwars Screeplot')
+```
+
+## Projection of data in 2 dimensions:  
+
+```{r}
+plot(pca$x[,1:2], main='Projection of the 1186 Survey Respondents \n in 2-dimensional space')
+```
+
+
+It is common for points to have the same or very similar scores along PCs, particularly when each variable has a limited range of values (i.e. binary or likert scale). This means that many points can be overlapping on a plot and that can be misleading. A common solution is to “jitter” the plot which merely adds some random error to the placement of the points so that you can see overlapping groups of points with more clarity:
+
+```{r}
+plot(jitter(pca$x[,1:2],amount=0.1), main='Projection of the 1186 Survey Respondents \n in 2-dimensional space (w/Jitter)')
+```
+
+
+Note the clusters of individuals outstanding on PC1. Let’s investigate the dominant variables driving PC1. We’ll simply look at the loadings of variables on PC1, ordered by the absolute value of their magnitude (the largest will be last by default - so here I’ve printed out the top 10).
+
+
+```{r}
+tail(pca$rotation[order(abs(pca$rotation[,1])),1],10)
+```
+
+
+Component1 appears to picks off people who are not fans or have never seen the movies or otherwise provided trash data (lots of missing values, contradictions, etc).
+
+```{r}
+look <- starwars[pca$x[,1]>5, ]
+```
+
+
+Lets subset the data according to this and rerun the analysis
+```{r}
+subset <- starwars.x[pca$x[,1]<4,]
+pca <- prcomp(subset)
+plot(pca$x[,1:2])
+```
+
+Let’s take a look at the biplot to see if we can find anything to note about the survey responses.
+
+```{r}
+biplot(pca, xlim = c(-.1,.15),ylim=c(-.12,.1),cex = c(.8, 1))
+```
+
+
