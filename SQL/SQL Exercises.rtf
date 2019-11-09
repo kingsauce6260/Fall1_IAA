@@ -1,0 +1,209 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2511
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 # Based on Music Database\
+\
+# How many records are in the track table?;\
+select count(*)\
+from test.Track\
+\
+\
+# How many records are in the movies table?\
+select count(*)\
+from practice.movies;\
+\
+\
+# How many DVDs cost more than $20?\
+select count(*)\
+from practice.movies\
+where dvd_price>20;\
+\
+# What DVDs cost more than $20?\
+select movie_name\
+from practice.movies\
+where dvd_price>20;\
+\
+\
+# Create a report to find the people who have the first name 'Francisco'? \
+# List their ID numbers and names\
+select id, name\
+from practice.people\
+where name like 'Francisco%';\
+\
+\
+# Create a report that lists the name of the person, and the name of the movie they own\
+select p.name, m.movie_name\
+from practice.people as p, practice.people_movies as pm, practice.movies as m\
+where p.id=pm.person_id and m.id=pm.movie_id;\
+\
+\
+\
+# Provide a report that lists the person name and the count of movies owned by person. \
+# Provide the count of movies in descending order.\
+select p.name, count(pm.movie_id) as Total\
+from practice.people as p, practice.people_movies as pm\
+where p.id=pm.person_id\
+group by p.name\
+order by Total desc;\
+\
+\
+\
+# What is the average DVD price for each movie rating? \
+# Do not ignore missing values for the ratings\
+select rating, avg(dvd_price) as AvgPrice\
+from practice.movies\
+group by rating;\
+\
+\
+\
+\
+\
+# List the ratings that have an average DVD price greater than 20. \
+# Do not ignore missing values for the ratings\
+select rating, avg(dvd_price) as AvgPrice\
+from practice.movies\
+group by rating\
+having AvgPrice>20;\
+\
+\
+# What is the grand total cost of all of the movies listed in the movies table?\
+select sum(dvd_price) as Total\
+from practice.movies;\
+\
+\
+# We want to reduce the price of each DVD by half. \
+# Create a report that lists the movie id, its current DVD price, and the new price\
+select id, dvd_price, (dvd_price/2) as NewPrice\
+from practice.movies;\
+\
+\
+\
+# How many movies in the list are not owned by anyone?\
+select id\
+from practice.movies\
+except\
+select movie_id\
+from practice.people_movies;\
+\
+select count(*)\
+from practice.movies\
+where id NOT IN (select movie_id\
+                 from practice.people_movies);\
+\
+\
+\
+# Create a NEW table that lists the name of the studios, and their respective counts of movies.\
+\
+create table practice.temp as\
+select s.studio_name, count(m.id)\
+from practice.studios as s, practice.movies as m\
+where s.id=m.studio_id\
+group by s.studio_name;\
+\
+select *\
+from practice."temp";\
+\
+\
+# Insert a new person into the People table named "Jack Smith" with ID=3000.\
+insert into practice.people\
+(id, name)\
+values\
+(3003, 'Jack Smith');\
+\
+\
+\
+# Screwing Around Questions;\
+\
+# How many tracks are not in playlist?\
+select count(distinct TrackId)\
+from test.PlaylistTrack;\
+\
+select count(*)\
+from test.track;\
+\
+select count(*)\
+from test.track\
+where TrackId NOT IN (select TrackId\
+                      from test.PlaylistTrack);\
+\
+\
+\
+# How many albums per genre?\
+select g.Name, count(a.AlbumId) as Total\
+from test.album as a, test.Genre as g, test.Track as t\
+where g.GenreId=t.GenreId and a.AlbumId=t.AlbumId\
+group by g.Name\
+order by Total desc;\
+\
+\
+# What customer has purchased the most music?;\
+select c.FirstName, c.LastName, count(i.InvoiceId) as TotalBought\
+from test.Customer as c, test.Invoice as i\
+where c.CustomerId=i.CustomerId\
+group by c.CustomerId\
+order by TotalBought desc;\
+\
+\
+\
+# On avg what genre makes the most per album?\
+# break it down - how much does each album make?;\
+select a.Title, sum(t.UnitPrice) as AlbumPrice\
+from test.album as a, test.track as t\
+where a.AlbumId=t.AlbumId\
+group by a.AlbumId\
+order by AlbumPrice desc;\
+\
+\
+\
+\
+select Name, avg(AlbumPrice) as AvgPrice\
+from (select a.AlbumId, sum(t.UnitPrice) as AlbumPrice, g.Name\
+      from test.album as a, test.track as t, test.Genre as g\
+      where a.AlbumId=t.AlbumId and g.GenreId=t.GenreId\
+      group by a.AlbumId)\
+group by Name;\
+\
+\
+\
+\
+# What artist has made the longest material total?\
+select ar.Name, sum(t.Milliseconds) as TotalSung\
+from test.track as t, test.album as ab, test.artist as ar\
+where t.AlbumId=ab.AlbumId and ab.ArtistId=ar.ArtistId\
+group by ar.Name\
+order by TotalSung desc;\
+\
+\
+select *\
+from test.MediaType;\
+\
+\
+\
+# What city is the most popular for employees and cities?\
+select City, count(City) as total\
+from (select City\
+      from test.Employee3\
+      union all\
+      select City\
+      from test.Customer)\
+group by City\
+order by total desc;\
+\
+\
+select *\
+from test.Customer;\
+\
+\
+# List all employees and customers who start with d\
+select FirstName\
+from test.Employee3\
+where FirstName like 'C%';\
+union \
+select FirstName\
+from test.Customer\
+where FirstName like 'A%';\
+}
