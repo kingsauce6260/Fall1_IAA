@@ -1,0 +1,76 @@
+---
+title: "UK Food Consumption PCA"
+author: "Thomas Gow"
+date: "11/8/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# UK Food Consumption PCA
+## Class Example from Dr Race
+
+
+###Reading in the data
+```{r Data}
+# Reading in the data
+food <- read.csv("/Users/thomasgow/Documents/IAA/Fall1_IAA/Linear Algebra/PCA/ukfood.csv", header=TRUE,row.names=1)
+
+# Transposing the data
+food <- as.data.frame(t(food))
+head(food)
+
+
+# Saving as data frame
+food <- data.frame(food)
+```
+
+# Prcomp Explanation  
+Choosing the right function for PCA is important due to the memory needed to conduct PCA. The prcomp function is the one she most often recommends for reasonably sized principal component calculations in R. This function returns a list with class “prcomp” containing the following components (from help prcomp):  
+
+- sdev: the standard deviations of the principal components (i.e., the square roots of the eigenvalues of the covariance/correlation matrix, though the calculation is actually done with the singular values of the data matrix).  
+
+- rotation: the matrix of variable loadings (i.e., a matrix whose columns contain the eigenvectors). The function princomp returns this in the element loadings.  
+
+- x: if retx is true the value of the rotated data (the centred (and scaled if requested) data multiplied by the rotation matrix) is returned. Hence, cov(x) is the diagonal matrix diag(sdev^2). For the formula method, napredict() is applied to handle the treatment of values omitted by the na.action.  
+
+- center, scale: the centering and scaling used, or FALSE.  
+  
+  
+  
+```{r PCA}
+pca=prcomp(food, scale = F)
+```
+
+This first plot just looks at magnitudes of eigenvalues - it is essentially the screeplot in barchart form.
+
+```{r Plotting}
+plot(pca, main = "Bar-style Screeplot")
+```
+
+The next plot views our four datapoints (locations) projected onto the 2-dimensional subspace that captures as much information (i.e. variance) as possible  
+  
+  
+  
+```{r}
+plot(pca$x, xlab = "Principal Component 1", ylab = "Principal Component 2", main = 'The four observations projected into 2-dimensional space')
+text(pca$x[,1], pca$x[,2],row.names(food), cex=1)
+```
+
+
+Now we can also view our original variable axes projected down onto that same space! A visual you can relate this to: Take a plane (piece of poster board) running at an angle through the origin in 3 space. Think of the unit axis vectors being projected orthogonally onto this poster board… The closer the plane comes to that axis, the longer that projection will be. Long projections means that those principal components run close to the original variable - they are highly correlated - as you move along that principal component axis in space, you also move quickly in the direction of those original variables. Shorter projections indicate less correlation with PCs. Less correlation with major PCs may simply mean there isn’t much variance along those variables - the variables with the most variance are likely to dominate the first components, particularly for correlation PCA.  
+  
+  
+  
+```{r}
+biplot(pca, main = 'BiPlot: The observations and variables projected onto the same plane.',cex = c(1, .5))
+```
+
+
+
+
+
+
+

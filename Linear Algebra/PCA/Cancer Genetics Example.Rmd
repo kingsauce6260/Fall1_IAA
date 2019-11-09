@@ -17,7 +17,7 @@ This is a class example of how to use PCA with genetics.
 ```{r cars}
 library(rgl)
 library(RColorBrewer)
-load('/Users/thomasgow/Documents/IAA/Fall1_IAA/Linear Algebra/PCA/geneCancerUCI.RData')
+load('/Users/thomasgow/Desktop/untitled folder 2/LeukError-2.RData')
 table(cancerlabels$Class)
 ```
 
@@ -31,8 +31,8 @@ PRAD = Prostate Adenocarcinoma
 We are going to want to plot the data points according to their different classification labels. We should pick out a nice color palette for categorical attributes.
 
 
-```{r Colors}
-display.brewer.all()
+```{r Colors, }
+# display.brewer.all()
 ```
 
 
@@ -68,7 +68,7 @@ Below the first two principal components are computed and examined data is proje
 
 
 ```{r}
-pcaOut <- prcomp(cancer[,2:20532],3, scale = F)
+pcaOut <- prcomp(cancer[,2:20532], 3, scale = F)
 plot(pcaOut$x[,1],pcaOut$x[,2],col = cancerlabels$Class, xlab = "Principal Component 1", ylab = "Principal Component 2", main = 'Genetic Samples Projected into 2-dimensions')
 ```
 
