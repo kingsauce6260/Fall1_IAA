@@ -11,10 +11,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #PCA Homework Cluster Outliers  
 
-```{r cars}
+The prompt is in the PCA folder named email.txt.
+
+```{r data}
 #Load in R data table
 
-load('/Users/thomasgow/Documents/IAA/Fall1_IAA/Linear Algebra/PCA/LeukError-2.RData')
+load('/Users/thomasgow/Desktop/untitled folder 2/LeukError-2.RData')
 
 #38 observations 5001 variables
 
@@ -57,12 +59,3 @@ ggplot(plotdata, aes(x = PC1, y=PC2)) + geom_point(aes(colour = Type),size=3) +
   geom_text(aes(label=as.numeric(rownames(plotdata))),hjust=0, vjust=0, size=4)
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
