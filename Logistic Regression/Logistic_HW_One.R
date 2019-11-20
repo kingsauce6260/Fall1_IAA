@@ -93,65 +93,36 @@ for(i in 1:length(nom_name)){
 CHISQ_N_df <- dplyr::arrange(data.frame(nom_name, chisq), chisq)
 
 
-  
-  
-insurance_t <- na.omit(insurance_t)
-# Number of missing values (NA) for each variable
-sapply(insurance_t, function(x) sum(is.na(x)))
-
-# important variables
-summary_logit <- as.data.frame(summary(logit.model)$coefficients)
-summary_logit$Var_ID <- rownames(summary_logit)
-
-summary_logit <- dplyr::arrange(summary_logit, summary_logit$`Pr(>|z|)`)
-
-# The bank currently uses a 0.002 alpha cut off level
-# The significant variables would include in significant rank:
-# DDA, DDABAL, TELLER, SAVBAL, ATMAMT, MMBAL, PHONE
-# SAV, CD, DDABAL, TELLER, SAVBAL, ATMAMT, MM, CC, BRANCHB16,
-# MMBAL, INV, PHONE
-# Explore these relationships
-# Continuous variables
-# 
-ddabal_df <- select(insurance_t, INS, DDABAL)
-null_model <- glm(INS ~ 1, data = insurance_t, family = binomial)
-model_with_var <- glm(INS~DDABAL, data = ddabal_df, family = binomial)
-lrt <- anova(model_with_var, null_model, test = "LRT")
-significance[1] <- lrt$`Pr(>Chi)`[!is.na(lrt$`Pr(>Chi)`)]
-
-ddabal_df <- dplyr::filter(ddabal_df, DDABAL<4000)
-boxplot(DDABAL~INS,data=ddabal_df)
-
-# Important Binary Variables
-# SAV, CD, DDABAL, TELLER, SAVBAL, ATMAMT, MM, CC, BRANCHB16,
-# MMBAL, INV, PHONE
-# SAV
 
 
-# Continuous variables
-for(i in colnames(ordinal_vars)){
-  ins_temp <- insurance_t[,"INS"]
-  temp <- insurance_t[,i]
-  temp <- cbind(ins_temp, temp)
-  frmla <- as.formula(paste0("INS ~", i))
-  null_model <- glm(INS ~ 1, data = insurance_t, family = binomial)
-  model_with_var <- glm(frmla, data = insurance_t, family = binomial)
-  lrt <- anova(model_with_var, null_model, test = "LRT")
-  significance[i] <- lrt$`Pr(>Chi)`[!is.na(lrt$`Pr(>Chi)`)]
-  pearson_test <- chisq.test(temp)
-  significance <- pearson_test$p.value
-  
+# Variable Relationships with INS - Continuous
+cont_name <- colnames(ins_t_cont)
+
+chisq_c <- NULL
+
+for (i in 1:length(cont_name)) {
+  chisq_c[i] <- summary(glm(ins_t$INS ~ ins_t_cont[[i]],
+                            family = binomial(link = "logit")))$coef[2,4]
 }
 
-contingency_tbl <- table(tmp_dat[[variable]], tmp_dat[["INS"]])
-pearson_test <- chisq.test(contingency_tbl)
-significance <- pearson_test$p.value
+CHISQ_C_df <- dplyr::arrange(data.frame(cont_name, chisq_c), chisq_c)
 
 
+# Checking Assumptions for Continuous variables
+cont_name <- colnames(ins_t_cont)
 
-# Logistic Regression Model #
-logit.model <- glm(INS ~ ., 
-                   data = insurance_t, family = binomial(link = "logit"))
+GAM <- NULL
+
+for (i in 1:length(cont_name)) {
+  var_name <- ins_t_cont[[i]]
+  GAM[i] <- summary(gam(ins_t$INS ~ var_name, family = binomial(link = "logit"),
+                        method = "REML"))$p.pv[2]
+}
 
 
+GAM_df <- dplyr::arrange(data.frame(cont_name, GAM), GAM)
+
+
+# Number of missing value per variable
+sapply(ins_t, function(x) sum(is.na(x)))
 
