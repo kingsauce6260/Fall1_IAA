@@ -3,7 +3,12 @@
 Tic Tac Toe Game
 By: Thomas Gow
 """
+'''
+This was my coding skills at Python at beginning of the IAA program.
 
+*** Will redo at the end of the year to see the improvement of my coding skills,
+specifically adding functions to make my code way more efficient.***
+'''
 
 
 from beautifultable import BeautifulTable
